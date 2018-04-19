@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>Document</title>
+	<style>
+	*{
+		padding: 0;
+		margin: 0;
+		list-style: none;
+	}	
+	.swiper{
+		position: relative;
+		margin: 100px auto 0;
+		overflow: hidden;
+		/*width: 300px;*/
+		/*height: 500px;*/
+		/*border:1px solid red;*/
+	}
+	.swiper-wrap{
+		position: relative;
+		min-height: 143px;
+
+	}
+	.swiper-wrap li{
+		width: 100%;
+		position: absolute;
+		left: 0;
+		top: 0;
+		transform: translateX(100%);
+	}
+
+	.point-wrap{
+		text-align: center;
+		/*font-size: 0;*/
+		position: absolute;
+		left: 0;
+		bottom: 10px;
+		width: 100%;
+	}
+
+	.point-wrap li{
+		width: 7px;
+		height: 7px;
+		border:1px solid red;
+		border-radius: 50%;
+		display: inline-block;
+		margin: 0 3px;
+	}
+	.point-wrap li.active{
+		background: black;
+	}
+
+	img{
+		width: 100%;
+	}
+
+	</style>
+</head>
+<body>
+	<div class="swiper">
+		<ul class="swiper-wrap">
+			<li><a href="#"><img src="images/1.jpg"></a></li>
+			<li><a href="#"><img src="images/2.jpg"></a></li>
+			<li><a href="#"><img src="images/3.jpg"></a></li>
+			<li><a href="#"><img src="images/4.jpg"></a></li>
+		</ul>
+		<ol class="point-wrap">
+		</ol>
+	</div>
+
+	<script>
+		var swiper=document.querySelector(".swiper");
+		var swiperWrap=document.querySelector(".swiper-wrap");
+		var swiperWrapLi=swiperWrap.querySelectorAll("li");
+
+		var pointWrap=document.querySelector(".point-wrap")
+		//获取屏幕的宽度
+		var windowWidth=document.documentElement.offsetWidth;
+		// var windowWidth=300;
+		var left,center,right;
+		var timer=null;
+
+		swiperWrap.style.height=swiperWrapLi[0].offsetHeight+"px";
+
+		
+
+		// 添加小圆点
+		for(var i=0;i<swiperWrapLi.length;i++){
+			var li=document.createElement("li");
+			// console.log(li.classList)
+			if(i==0){
+				li.classList.add("active");
+			}
+			pointWrap.appendChild(li);
+		}
+
+		// 最初始的位置赋值
+		center=0;
+		right=1;
+		left=swiperWrapLi.length-1;
+
+		swiperWrapLi[left].style.transform="translateX("+-windowWidth+"px)"
+		swiperWrapLi[center].style.transform="translateX(0px)"
+		swiperWrapLi[right].style.transform="translateX("+windowWidth+"px)"
+
+
+		function showNext(){
+			left=center;
+			center=right;
+			right++;
+
+			if(right>swiperWrapLi.length-1){
+				right=0;
+			}
+			//添加过渡
+			swiperWrapLi[center].style.transition="transform 0.5s";
+			swiperWrapLi[left].style.transition="transform 0.5s";
+			// 右边的图片永远是替补图片， 所以不需要走过渡，因为走过渡会穿帮
+			swiperWrapLi[right].style.transition="none";
+			setPoint();
+			// 归位
+			swiperWrapLi[left].style.transform="translateX("+-windowWidth+"px)";
+			swiperWrapLi[center].style.transform="translateX(0px)";
+			swiperWrapLi[right].style.transform="translateX("+windowWidth+"px)";
+		}
+//  left center right  --表示显示前面的
+		function showPrev(){
+			right=center;
+			center=left;
+			left--;
+
+			if(left<0){
+				left=swiperWrapLi.length-1;
+			}
+
+			swiperWrapLi[center].style.transition="transform 0.5s";
+			swiperWrapLi[left].style.transition="none";
+			swiperWrapLi[right].style.transition="transform 0.5s";
+
+			setPoint();
+			swiperWrapLi[left].style.transform="translateX("+-windowWidth+"px)";
+			swiperWrapLi[center].style.transform="translateX(0px)";
+			swiperWrapLi[right].style.transform="translateX("+windowWidth+"px)";
+		}
+
+		var pointWrapLi=pointWrap.querySelectorAll("li");
+
+		function setPoint(){
+			for(var i=0;i<pointWrapLi.length;i++){
+				pointWrapLi[i].classList.remove("active");
+			}
+			pointWrapLi[center].classList.add("active");
+		}
+
+		timer=setInterval(showNext,1000);
+
+
+
+		swiper.addEventListener("touchstart",touchstartHandler);
+		swiper.addEventListener("touchmove",touchmoveHandler);
+		swiper.addEventListener("touchend",touchendHandler);
+
+
+		var startX=0; //记录开始的时候的手指落点
+		var moveX=0; //记录移动最终的手指落点
+		var starTime=null;//起始时间
+
+		function touchstartHandler(e){
+			starTime=new Date();
+			// console.log(e.touches)
+			clearInterval(timer);
+			startX=e.touches[0].pageX;
+			// cons
+
+			swiperWrapLi[center].style.transition="none";
+			swiperWrapLi[left].style.transition="none";
+			swiperWrapLi[right].style.transition="none";
+		}
+
+		function touchmoveHandler(e){
+			//获得移动的最终手指落点
+			moveX=e.touches[0].pageX;
+			var dx=moveX-startX;
+			// console.log("!11",dx)
+			// console.log(left,center,right,dx-windowWidth)
+			swiperWrapLi[left].style.transform="translateX("+(dx-windowWidth)+"px)";
+			swiperWrapLi[center].style.transform="translateX("+dx+"px)";
+			swiperWrapLi[right].style.transform="translateX("+(dx+windowWidth)+"px)";
+		}
+
+		function touchendHandler(e){
+			// 获取滑动时间
+			var dTime=new Date()-starTime;
+			// var endX=e.c
+			// console.log(e.changedTouches)
+			console.log(e.changedTouches[0].pageX,startX)
+			// 最终位置差  向右滑动 起始点小 
+			var endX=e.changedTouches[0].pageX-startX;
+			// console.log(endX)
+			// 滑动距离超过屏幕的四分之1 或者滑动的时间小于300 同时距离大于30px
+			if(endX>(windowWidth/4) || (dTime<300 && endX>30)){
+				showPrev();
+
+
+			}else if(endX< -(windowWidth/4) || (dTime<300) && endX<-30){
+				showNext();
+
+			}else{
+				// 给元素添加过渡
+				swiperWrapLi[center].style.transition="transform 0.5s"
+				swiperWrapLi[left].style.transition="transform 0.5s"
+				swiperWrapLi[right].style.transition="transform 0.5s"
+
+				// 归位
+				swiperWrapLi[left].style.transform="translateX("+-windowWidth+"px)"
+				swiperWrapLi[center].style.transform="translateX(0px)"
+				swiperWrapLi[right].style.transform="translateX("+windowWidth+"px)"
+			}
+
+			timer=setInterval(showNext,1000);
+		}
+	</script>
+</body>
+</html>

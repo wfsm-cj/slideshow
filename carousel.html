@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+	*{
+		margin: 0;padding: 0;
+	}
+	.screen {
+		position: relative;
+		width: 200px;
+		height: 200px;
+		border:1px solid blue;
+		overflow: hidden;
+		margin: 30px auto;
+	}
+	.screen ul{
+		position: absolute;
+		width: 2000px;
+	}
+		.screen li{
+			width: 200px;
+			height: 200px;
+			float: left;
+
+		}
+		.all ol li{
+			width: 20px;
+			height: 20px;
+			border:1px solid red;
+			float: left;
+			background:#fff;
+			margin-left: 10px;
+			cursor: pointer;
+		}
+
+		.all ol li.current{
+			background: yellow;
+		}
+
+		.all ol {
+			position: absolute;
+			z-index: 10;
+			list-style: none;
+		}
+		.all #arr{
+			position: absolute;
+			top: 50px;
+			z-index: 10;
+			width: 200px;
+			height: 50px;
+			/*display: none;*/
+		}
+		.all #arr span{
+			position: absolute;
+			width: 50px;
+			height: 50px;
+			background-color: #ccc;
+			font-size: 30px;
+			text-align: center;
+			line-height: 50px;
+		}
+		.all #arr span:nth-of-type(1){
+			left: 0;
+		}
+		.all #arr span:nth-of-type(2){
+			right: 0;
+		}
+	</style>
+</head>
+<body>
+	<div class="all">
+		<div class="screen" id="box">
+			<ul>
+				<li><a href="javascript:;"><img src="images/01.jpg" alt=""></a></li>
+				<li><a href="javascript:;"><img src="images/02.jpg" alt=""></a></li>
+				<li><a href="javascript:;"><img src="images/03.jpg" alt=""></a></li>
+				<li><a href="javascript:;"><img src="images/04.jpg" alt=""></a></li>
+				<li><a href="javascript:;"><img src="images/05.jpg" alt=""></a></li>
+			</ul>
+
+			<ol></ol>
+			<div id="arr"><span class="left">&lt;</span><span class="right">&gt;</span></div>
+		</div>
+
+		
+	</div>
+	<script>
+		function animate(el,target){
+			if(el.timer){
+				clearInterval(el.timer);
+			}
+			el.timer=setInterval(function(){
+				var leader=el.offsetLeft;
+				var step=30;
+				if(target<leader){
+					step=-30;
+				}
+				// 到达终点的距离 小于step 直接跨过去
+				if(Math.abs(target-leader)>=Math.abs(step)){
+					leader=leader+step;
+					el.style.left=leader+"px";
+				}else{
+					clearInterval(el.timer);
+					el.style.left=target+"px";
+				}
+			},15)
+		}
+	</script>
+	<script>
+		window.onload=function(){
+			// function animate(){
+
+			// }
+			var box=document.querySelector(".all");
+			var screen=document.querySelector(".screen");
+			// console.log(screen.children)
+			var ul=screen.children[0];
+			var ulLis=ul.children;
+			var ol=screen.children[1];
+
+			var imgWidth=ulLis[0].offsetWidth;
+			var arr=document.querySelector("#arr");
+			var arrLeft=document.querySelector(".left");
+			var arrRight=document.querySelector(".right");
+
+			var timer=null;//
+			var picIndex=0;
+
+			for(var i=0;i<ulLis.length;i++){
+				var li=document.createElement("li");
+				ol.appendChild(li);
+				li.innerText=i+1;
+			}
+			var olLis=ol.children;
+			olLis[0].className="current";
+
+			//克隆li
+			var cloneLi=ulLis[0].cloneNode(true);
+			// var cloneLiLast=ulLis[ulLis.length-1].cloneNode(true);
+			ul.appendChild(cloneLi);
+			// ul.insertBefore(cloneLiLast,ulLis[0]);
+
+			// 点击ol 遍历
+			for(var i=0;i<olLis.length;i++){
+				olLis[i].index=i;
+				olLis[i].addEventListener("click",function(){
+					for(var i=0;i<olLis.length;i++){
+						olLis[i].className=""
+					}
+					this.className="current";
+					var target=-this.index*imgWidth;//要移动的距离
+					animate(ul,target);
+
+					picIndex=this.index;//
+				})
+			}
+
+			// 
+			screen.onmouseenter=function(){
+				arr.style.display="block";
+				console.log("enter")
+				clearInterval(timer);
+			}
+			screen.onmouseleave=function(){
+				arr.style.display="none";
+				console.log("le")
+				timer=setInterval(function(){
+					arrRight.onclick();
+				},1000)
+			}
+
+		// 右箭头点击
+			arrRight.onclick=function(){
+				if(picIndex===olLis.length){
+					ul.style.left=0;
+					picIndex=0;
+				}
+				picIndex++;
+				var olIndex=picIndex;
+				if(olIndex>=olLis.length){
+					olIndex=0
+				}
+				for(var i=0;i<olLis.length;i++){
+					olLis[i].className="";
+				}
+				olLis[olIndex].className="current";
+				var target=-picIndex*imgWidth;
+				animate(ul,target);
+			}
+		// 左箭头点击
+			arrLeft.onclick=function(){
+				
+				if(picIndex===0){
+					ul.style.left=-(ulLis.length-1)*imgWidth+"px";
+					picIndex=ulLis.length-1;
+				}
+				console.log(picIndex)
+				picIndex--;
+				var olIndex=picIndex;
+				// if(olIndex<=0){
+				// 	olIndex=olLis.length-1;
+				// }
+				for(var i=0;i<olLis.length;i++){
+					olLis[i].className="";
+				}
+				olLis[picIndex].className="current";
+				var target=-picIndex*imgWidth;
+				animate(ul,target)
+			}
+
+
+			timer=setInterval(function(){
+				arrRight.onclick();
+			},1000)
+
+			//禁止选择文本  onselect
+			screen.onselectstart=function(){
+				return false;
+			}
+		}
+	</script>
+</body>
+</html>

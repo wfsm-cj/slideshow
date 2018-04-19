@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<style>
+		html,body{
+			width: 100%;
+		}
+		*{
+			margin: 0;padding: 0;
+			list-style: none;
+		}
+		.box{
+			width: 533px;
+			height: 300px;
+			margin: 100px auto;
+			border:1px solid #000;
+			display: flex;
+		}
+		.box ul{
+			width: 533px;
+			height: 300px;
+			position: relative;
+			transform-style: preserve-3d;
+			transition: transform 1s;
+		}
+		.box ul:nth-child(1){
+			transition-delay: 0s;
+		}
+		.box ul:nth-child(2){
+			transition-delay: 0.2s;
+		}
+		.box ul:nth-child(3){
+			transition-delay: 0.4s;
+		}
+		.box ul:nth-child(4){
+			transition-delay: 0.6s;
+		}
+
+		.box ul li{
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			left: 0;
+			top: 0;
+			overflow: hidden;
+		}
+
+		.box ul li:nth-child(1){
+			transform: rotateX(90deg) translateZ(150px);
+		}
+		.box ul li:nth-child(2){
+			transform: rotateX(-90deg) translateZ(150px);
+		}
+		.box ul li:nth-child(3){
+			transform: translateZ(150px);
+		}
+		.box ul li:nth-child(4){
+			transform: rotateX(180deg) translateZ(150px);
+		}
+
+		.box ul:nth-child(2) img{
+			margin-left: -134px;
+		}
+		.box ul:nth-child(3) img{
+			margin-left: -268px;
+		}
+		.box ul:nth-child(4) img{
+			margin-left: -402px;
+		}
+		.btn{
+			position: fixed;
+			left: 0;right: 0;
+			top: 20px;
+			margin: 20px auto 0;
+			width: 200px;
+		}
+	</style>
+	<div class="box">
+		<ul>
+			<li><img src="images/1.jpg" alt=""></li>
+			<li><img src="images/2.jpg" alt=""></li>
+			<li><img src="images/3.jpg" alt=""></li>
+			<li><img src="images/4.jpg" alt=""></li>
+		</ul>
+		<ul>
+			<li><img src="images/1.jpg" alt=""></li>
+			<li><img src="images/2.jpg" alt=""></li>
+			<li><img src="images/3.jpg" alt=""></li>
+			<li><img src="images/4.jpg" alt=""></li>
+		</ul>
+		<ul>
+			<li><img src="images/1.jpg" alt=""></li>
+			<li><img src="images/2.jpg" alt=""></li>
+			<li><img src="images/3.jpg" alt=""></li>
+			<li><img src="images/4.jpg" alt=""></li>
+		</ul>
+		<ul>
+			<li><img src="images/1.jpg" alt=""></li>
+			<li><img src="images/2.jpg" alt=""></li>
+			<li><img src="images/3.jpg" alt=""></li>
+			<li><img src="images/4.jpg" alt=""></li>
+		</ul>
+	</div>
+
+
+	<div class="btn">
+		<button data-id="up">up</button>
+		<button>down</button>
+	</div>
+
+	<script>
+		window.onload=function(){
+			var box=document.querySelector(".box");
+			var ul=box.querySelectorAll("ul");
+			var li=box.querySelectorAll("li");
+			var btns=document.querySelectorAll("button");
+
+			var num=0;
+			//防止用户暴力点击
+			var flag=true;
+			// transitionend 事件 在CSS完成过渡后触发，如果过渡在完成前移除 transition-property属性被移除
+			ul[ul.length-1].addEventListener("transitionend",function(){
+				console.log("end")
+				flag=true;
+			})
+
+			for(var i=0;i<btns.length;i++){
+				btns[i].setAttribute("data-index",i);
+				btns[i].addEventListener("click",function(){
+					if(flag){
+						flag=false;
+						console.log(this.dataset)
+						var index=this.dataset["index"];
+						if(index==1){
+							num++;
+						}else if(index==0){
+							num--;
+						}
+						console.log(num)
+						for(var i=0;i<ul.length;i++){
+							ul[i].style.transform="rotateX("+num*90+"deg)";
+						}
+					}
+					
+				})
+			}
+
+
+		}
+	</script>
+</body>
+</html>
